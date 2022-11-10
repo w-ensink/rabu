@@ -1,19 +1,32 @@
-use crate::units::{Channels, Samples};
 use std::ops::Range;
 
+use crate::units::{Channels, Samples};
+
 #[derive(Clone, Debug)]
-pub struct Buffer {
-    data: Vec<f32>,
+pub struct Buffer<T> {
+    data: Vec<T>,
     num_channels: Channels,
     num_samples: Samples,
 }
 
-impl Buffer {
+impl<T> Buffer<T>
+where
+    T: Copy + Default + PartialEq,
+{
+    pub fn is_default_filled(&self) -> bool {
+        self.data.iter().all(|s| *s == T::default())
+    }
+}
+
+impl<T> Buffer<T>
+where
+    T: Copy + Default,
+{
     pub fn allocate(num_channels: Channels, num_samples: Samples) -> Self {
         let total_num_samples = num_samples.as_usize() * num_channels.as_usize();
         let mut data = Vec::with_capacity(total_num_samples);
 
-        data.resize(total_num_samples, 0.0);
+        data.resize(total_num_samples, T::default());
 
         Self {
             data,
@@ -22,16 +35,16 @@ impl Buffer {
         }
     }
 
-    pub fn data(&self) -> &[f32] {
+    pub fn data(&self) -> &[T] {
         &self.data
     }
 
-    pub fn data_mut(&mut self) -> &mut [f32] {
+    pub fn data_mut(&mut self) -> &mut [T] {
         &mut self.data
     }
 
-    pub fn zero_out(&mut self) {
-        self.data.fill(0.0);
+    pub fn fill_default(&mut self) {
+        self.data.fill(T::default());
     }
 
     pub fn channel_indices(&self) -> Range<usize> {
@@ -42,10 +55,6 @@ impl Buffer {
         0..self.num_samples.as_usize()
     }
 
-    pub fn is_silent(&self) -> bool {
-        self.data.iter().all(|s| *s == 0.0)
-    }
-
     pub fn num_channels(&self) -> Channels {
         self.num_channels
     }
@@ -54,7 +63,7 @@ impl Buffer {
         self.num_samples
     }
 
-    pub fn chan(&self, index: usize) -> &[f32] {
+    pub fn chan(&self, index: usize) -> &[T] {
         if index >= self.num_channels.as_usize() {
             panic!();
         }
@@ -64,7 +73,7 @@ impl Buffer {
         &self.data[start..end]
     }
 
-    pub fn chan_mut(&mut self, index: usize) -> &mut [f32] {
+    pub fn chan_mut(&mut self, index: usize) -> &mut [T] {
         if index >= self.num_channels().as_usize() {
             panic!();
         }
@@ -74,14 +83,14 @@ impl Buffer {
         &mut self.data[start..end]
     }
 
-    pub fn iter_chans(&self) -> ChannelIterator {
+    pub fn iter_chans(&self) -> ChannelIterator<T> {
         ChannelIterator {
             buffer: self,
             current_channel: 0,
         }
     }
 
-    pub fn iter_chans_mut(&mut self) -> MutChannelIterator {
+    pub fn iter_chans_mut(&mut self) -> MutChannelIterator<T> {
         MutChannelIterator {
             buffer: self,
             current_channel: 0,
@@ -99,13 +108,13 @@ impl Buffer {
         }
     }
 
-    pub fn map_samples(&mut self, mut func: impl FnMut(f32) -> f32) {
+    pub fn map_samples(&mut self, mut func: impl FnMut(T) -> T) {
         self.data
             .iter_mut()
             .for_each(|sample| *sample = func(*sample));
     }
 
-    pub fn iter_interleaved(&self) -> InterleavedIterator {
+    pub fn iter_interleaved(&self) -> InterleavedIterator<T> {
         InterleavedIterator {
             buffer: self,
             index: 0,
@@ -113,13 +122,19 @@ impl Buffer {
     }
 }
 
-pub struct InterleavedIterator<'a> {
-    buffer: &'a Buffer,
+pub struct InterleavedIterator<'a, T>
+where
+    T: Copy + Default,
+{
+    buffer: &'a Buffer<T>,
     index: usize,
 }
 
-impl<'a> Iterator for InterleavedIterator<'a> {
-    type Item = f32;
+impl<'a, T> Iterator for InterleavedIterator<'a, T>
+where
+    T: Copy + Default,
+{
+    type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
         let num_channels = self.buffer.num_channels().as_usize();
@@ -136,13 +151,19 @@ impl<'a> Iterator for InterleavedIterator<'a> {
     }
 }
 
-pub struct MutChannelIterator<'a> {
-    buffer: &'a mut Buffer,
+pub struct MutChannelIterator<'a, T>
+where
+    T: Copy,
+{
+    buffer: &'a mut Buffer<T>,
     current_channel: usize,
 }
 
-impl<'a> Iterator for MutChannelIterator<'a> {
-    type Item = &'a mut [f32];
+impl<'a, T> Iterator for MutChannelIterator<'a, T>
+where
+    T: Copy + Default,
+{
+    type Item = &'a mut [T];
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.current_channel >= self.buffer.num_channels().as_usize() {
@@ -156,13 +177,19 @@ impl<'a> Iterator for MutChannelIterator<'a> {
     }
 }
 
-pub struct ChannelIterator<'a> {
-    buffer: &'a Buffer,
+pub struct ChannelIterator<'a, T>
+where
+    T: Copy + Default,
+{
+    buffer: &'a Buffer<T>,
     current_channel: usize,
 }
 
-impl<'a> Iterator for ChannelIterator<'a> {
-    type Item = &'a [f32];
+impl<'a, T> Iterator for ChannelIterator<'a, T>
+where
+    T: Copy + Default,
+{
+    type Item = &'a [T];
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.current_channel >= self.buffer.num_channels.as_usize() {
@@ -195,21 +222,21 @@ mod tests {
 
     #[test]
     fn correct_num_samples_and_channels() {
-        let buffer = Buffer::allocate(Channels(2), Samples(10));
+        let buffer = Buffer::<f32>::allocate(Channels(2), Samples(10));
         assert_eq!(buffer.num_samples(), Samples(10));
         assert_eq!(buffer.num_channels(), Channels(2));
     }
 
     #[test]
     fn index_into_channels() {
-        let buffer = Buffer::allocate(Channels(2), Samples(10));
+        let buffer = Buffer::<f32>::allocate(Channels(2), Samples(10));
 
         assert_eq!(buffer.chan(0).len(), buffer.num_samples().as_usize());
     }
 
     #[test]
     fn iterate_channels() {
-        let buffer = Buffer::allocate(Channels(2), Samples(10));
+        let buffer = Buffer::<f32>::allocate(Channels(2), Samples(10));
         let mut num = 0;
         for _chan in buffer.iter_chans() {
             num += 1;
@@ -220,7 +247,7 @@ mod tests {
 
     #[test]
     fn map_samples() {
-        let mut buffer = Buffer::allocate(Channels(2), Samples(3));
+        let mut buffer = Buffer::<f32>::allocate(Channels(2), Samples(3));
         buffer.map_samples(|_| 0.5);
         assert_eq!(buffer.chan(1)[2], 0.5);
     }
