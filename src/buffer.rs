@@ -2,8 +2,11 @@ use std::ops::Range;
 
 use crate::units::{Channels, Samples};
 
+/// Multi-channel buffer for any type of audio. It has some utility
+/// functions that make common audio related tasks simpler.
 #[derive(Clone, Debug)]
 pub struct Buffer<T> {
+    /// The actual stored data, channels are stored one after the other (not interleaved)
     data: Vec<T>,
     num_channels: Channels,
     num_samples: Samples,
@@ -13,6 +16,8 @@ impl<T> Buffer<T>
 where
     T: Copy + Default + PartialEq,
 {
+    /// Tells you whether the buffer is filled with the default value of the contained type.
+    /// This is useful to check if the complete buffer is silent for example.
     pub fn is_default_filled(&self) -> bool {
         self.data.iter().all(|s| *s == T::default())
     }
@@ -22,6 +27,7 @@ impl<T> Buffer<T>
 where
     T: Copy + Default,
 {
+    /// Allocates a new buffer with the given number of channels and samples.
     pub fn allocate(num_channels: Channels, num_samples: Samples) -> Self {
         let total_num_samples = num_samples.as_usize() * num_channels.as_usize();
         let mut data = Vec::with_capacity(total_num_samples);
@@ -35,34 +41,48 @@ where
         }
     }
 
+    /// Returns a reference to the internal buffer. Channels are stored one after the other,
+    /// so **not** interleaved!
     pub fn data(&self) -> &[T] {
         &self.data
     }
 
+    /// Returns a mutable reference to the internal buffer. Channels are stored one after the other,
+    /// so **not** interleaved!
     pub fn data_mut(&mut self) -> &mut [T] {
         &mut self.data
     }
 
+    /// Fills the buffer with the default value of the given type `T`. This can be useful to
+    /// make the buffer silent for example.
     pub fn fill_default(&mut self) {
         self.data.fill(T::default());
     }
 
+    /// Gives you the channel numbers as a range. This can be useful when you want to iterate over
+    /// the channel indices.
     pub fn channel_indices(&self) -> Range<usize> {
         0..self.num_channels.as_usize()
     }
 
+    /// Gives you the sample indices as a range. This can be useful when you want to use the
+    /// sample index in the loop for some reason.
     pub fn sample_indices(&self) -> Range<usize> {
         0..self.num_samples.as_usize()
     }
 
+    /// Returns the number of channels in the buffer.
     pub fn num_channels(&self) -> Channels {
         self.num_channels
     }
 
+    /// Returns the number of samples that each channel contains
+    /// (**not the total number of samples in the buffer**).
     pub fn num_samples(&self) -> Samples {
         self.num_samples
     }
 
+    /// Returns a reference to the given channel (indexing starts at 0).
     pub fn chan(&self, index: usize) -> &[T] {
         if index >= self.num_channels.as_usize() {
             panic!();
@@ -73,6 +93,7 @@ where
         &self.data[start..end]
     }
 
+    /// Returns a mutable reference to the given channel (indexing starts at 0).
     pub fn chan_mut(&mut self, index: usize) -> &mut [T] {
         if index >= self.num_channels().as_usize() {
             panic!();
@@ -83,6 +104,7 @@ where
         &mut self.data[start..end]
     }
 
+    /// Returns an iterator to iterate over the channels in the buffer.
     pub fn iter_chans(&self) -> ChannelIterator<T> {
         ChannelIterator {
             buffer: self,
@@ -90,6 +112,7 @@ where
         }
     }
 
+    /// Returns a mutable iterator to iterate over the channels in the buffer.
     pub fn iter_chans_mut(&mut self) -> MutChannelIterator<T> {
         MutChannelIterator {
             buffer: self,
@@ -97,6 +120,8 @@ where
         }
     }
 
+    /// Copies the content of self into the given target buffer.
+    /// This will panic if the buffers are not of the same size.
     pub fn copy_into(&self, dest: &mut Self) {
         assert_eq!(self.num_channels(), dest.num_channels());
         assert_eq!(self.num_samples(), dest.num_samples());
@@ -108,12 +133,15 @@ where
         }
     }
 
+    /// Applies the given map function to all samples in the buffer.
+    /// This can be useful for multiplying all samples by some value, for example.
     pub fn map_samples(&mut self, mut func: impl FnMut(T) -> T) {
         self.data
             .iter_mut()
             .for_each(|sample| *sample = func(*sample));
     }
 
+    /// Iterate over all samples in the buffer, but make it behave like an interleaved buffer.
     pub fn iter_interleaved(&self) -> InterleavedIterator<T> {
         InterleavedIterator {
             buffer: self,
