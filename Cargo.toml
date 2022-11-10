@@ -1,0 +1,16 @@
+[package]
+name = "rab"
+version = "0.1.0"
+edition = "2021"
+description = "Rust Audio Basics"
+authors = ["Wouter Ensink"]
+
+
+[dependencies]
+derive_more = "0.99.17"
+partial-min-max = "0.4.0"
+serde = { version = "1.0.147", features = ["derive"] }
+
+
+[dev-dependencies]
+test-case = "2.2.2"
