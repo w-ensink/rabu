@@ -1,3 +1,4 @@
+use std::cmp::min;
 use std::ops::Range;
 
 use crate::units::{Channels, Samples};
@@ -39,6 +40,19 @@ where
             num_channels,
             num_samples,
         }
+    }
+
+    /// Creates a new buffer with the given size, copying all data from self.
+    pub fn clone_resized(&self, num_channels: Channels, num_samples: Samples) -> Self {
+        let mut target = Self::allocate(num_channels, num_samples);
+
+        for channel in 0..min(self.num_channels(), num_channels).as_usize() {
+            for sample in 0..min(self.num_samples(), num_samples).as_usize() {
+                target.chan_mut(channel)[sample] = self.chan(channel)[sample];
+            }
+        }
+
+        target
     }
 
     /// Returns a reference to the internal buffer. Channels are stored one after the other,
@@ -278,5 +292,40 @@ mod tests {
         let mut buffer = Buffer::<f32>::allocate(Channels(2), Samples(3));
         buffer.map_samples(|_| 0.5);
         assert_eq!(buffer.chan(1)[2], 0.5);
+    }
+
+    #[test]
+    fn clone_with_new_bigger_size() {
+        let mut buffer = Buffer::<f32>::allocate(Channels(2), Samples(3));
+        for chan in buffer.channel_indices() {
+            for samp in buffer.sample_indices() {
+                buffer.chan_mut(chan)[samp] = samp as f32;
+            }
+        }
+
+        let resized = buffer.clone_resized(Channels(3), Samples(4));
+
+        assert_eq!(resized.chan(0)[1], 1.0);
+        assert_eq!(resized.chan(0)[3], 0.0);
+
+        assert_eq!(resized.chan(1)[1], 1.0);
+        assert_eq!(resized.chan(1)[3], 0.0);
+
+        assert_eq!(resized.chan(2)[1], 0.0);
+    }
+
+    #[test]
+    fn clone_with_new_smaller_size() {
+        let mut buffer = Buffer::<f32>::allocate(Channels(2), Samples(3));
+        for chan in buffer.channel_indices() {
+            for samp in buffer.sample_indices() {
+                buffer.chan_mut(chan)[samp] = samp as f32;
+            }
+        }
+
+        let resized = buffer.clone_resized(Channels(1), Samples(2));
+
+        assert_eq!(resized.chan(0)[1], 1.0);
+        assert_eq!(resized.chan(0)[0], 0.0);
     }
 }
