@@ -1,4 +1,5 @@
 use std::ops::{Add, AddAssign, Sub};
+
 use derive_more::{Add, AddAssign, Sub, SubAssign};
 use partial_min_max::{max, min};
 use serde::{Deserialize, Serialize};
@@ -111,7 +112,19 @@ impl SampleRate {
 }
 
 #[derive(
-    Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq, Add, Sub, AddAssign, SubAssign,
+    Serialize,
+    Deserialize,
+    Copy,
+    Clone,
+    Debug,
+    PartialEq,
+    Eq,
+    Add,
+    Sub,
+    AddAssign,
+    SubAssign,
+    PartialOrd,
+    Ord,
 )]
 pub struct Channels(pub u32);
 
