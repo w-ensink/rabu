@@ -10,7 +10,7 @@ repository = "https://github.com/w-ensink/rabu"
 readme = "README.md"
 categories = ["multimedia::audio"]
 keywords = ["audio", "utilities"]
-exclude = [".github/*"]
+exclude = [".github/*", "justfile"]
 
 
 [features]
