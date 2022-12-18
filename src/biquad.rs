@@ -1,19 +1,19 @@
-/// This module contains a biquad filter that can be instantiated
-/// with provided coefficients. On top of that it contains some functions to create
-/// the coefficients for the basic filter types.
-/// Example of a low pass filter:
-/// ```rust
-/// use rabu::biquad::{BiquadFilter, low_pass_coefficients};
-///
-/// let sample_rate = 44100.0;
-/// let cutoff = 1000.0;
-/// let coefficients = low_pass_coefficients(sample_rate, cutoff);
-///
-/// let mut filter = BiquadFilter::new(coefficients);
-///
-/// let input_sample = 0.5;
-/// let output_sample = filter.process(input_sample);
-/// ```
+//! This module contains a biquad filter that can be instantiated
+//! with provided coefficients. On top of that it contains some functions to create
+//! the coefficients for the basic filter types.
+//! Example of a low pass filter:
+//! ```rust
+//! use rabu::biquad::{BiquadFilter, low_pass_coefficients};
+//!
+//! let sample_rate = 44100.0;
+//! let cutoff = 1000.0;
+//! let coefficients = low_pass_coefficients(sample_rate, cutoff);
+//!
+//! let mut filter = BiquadFilter::new(coefficients);
+//!
+//! let input_sample = 0.5;
+//! let output_sample = filter.process(input_sample);
+//! ```
 
 /// The coefficients for a `BiquadFilter`.
 pub struct BiquadCoefficients {
