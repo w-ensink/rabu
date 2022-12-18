@@ -10,6 +10,8 @@ repository = "https://github.com/w-ensink/rabu"
 readme = "README.md"
 categories = ["multimedia::audio"]
 keywords = ["audio", "utilities"]
+exclude = [".github/*"]
+
 
 [features]
 default = []
@@ -23,3 +25,4 @@ serde = { version = "1.0.147", optional = true, features = ["derive"] }
 
 [dev-dependencies]
 test-case = "2.2.2"
+
