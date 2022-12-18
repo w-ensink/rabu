@@ -4,7 +4,12 @@ version = "0.2.2"
 edition = "2021"
 description = "Rust Audio Basic Utilies"
 authors = ["Wouter Ensink"]
-
+license = "MIT"
+homepage = "https://github.com/w-ensink/rabu"
+repository = "https://github.com/w-ensink/rabu"
+readme = "README.md"
+categories = ["multimedia::audio"]
+keywords = ["audio", "utilities"]
 
 [dependencies]
 derive_more = "0.99.17"
