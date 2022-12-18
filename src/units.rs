@@ -2,14 +2,16 @@ use std::ops::{Add, AddAssign, Sub};
 
 use derive_more::{Add, AddAssign, Sub, SubAssign};
 use partial_min_max::{max, min};
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
 /// Represents a percentage, e.g. the export progress.
 #[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Percentage(pub f64);
 
 /// Represents a bit depth for an audio file.
-#[derive(Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum BitDepth {
     Bits8,
     Bits16,
@@ -30,19 +32,8 @@ impl BitDepth {
 }
 
 /// Represent seconds in audio domain.
-#[derive(
-    Serialize,
-    Deserialize,
-    Copy,
-    Clone,
-    Debug,
-    PartialEq,
-    Add,
-    Sub,
-    AddAssign,
-    SubAssign,
-    PartialOrd,
-)]
+#[derive(Copy, Clone, Debug, PartialEq, Add, Sub, AddAssign, SubAssign, PartialOrd)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Seconds(pub f64);
 
 impl Seconds {
@@ -63,21 +54,8 @@ impl Seconds {
 }
 
 /// Represents samples in the audio domain.
-#[derive(
-    Serialize,
-    Deserialize,
-    Copy,
-    Clone,
-    Debug,
-    Eq,
-    PartialEq,
-    Add,
-    Sub,
-    AddAssign,
-    SubAssign,
-    Ord,
-    PartialOrd,
-)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Add, Sub, AddAssign, SubAssign, Ord, PartialOrd)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Samples(pub u64);
 
 impl Samples {
@@ -103,7 +81,8 @@ impl Samples {
 }
 
 /// Represents a sample rate (in Hz.).
-#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct SampleRate(pub u32);
 
 impl SampleRate {
@@ -129,21 +108,8 @@ impl SampleRate {
 }
 
 /// Represents a number of audio channels.
-#[derive(
-    Serialize,
-    Deserialize,
-    Copy,
-    Clone,
-    Debug,
-    PartialEq,
-    Eq,
-    Add,
-    Sub,
-    AddAssign,
-    SubAssign,
-    PartialOrd,
-    Ord,
-)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Add, Sub, AddAssign, SubAssign, PartialOrd, Ord)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Channels(pub u32);
 
 impl Channels {
@@ -169,7 +135,8 @@ impl Channels {
 }
 
 /// Represents a latency in the audio domain.
-#[derive(Serialize, Deserialize, Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Latency(pub Seconds);
 
 impl Latency {
@@ -185,7 +152,8 @@ impl Latency {
 }
 
 /// Represents a time point in the audio domain, e.g. the start position of a file.
-#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, PartialOrd)]
+#[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct TimePoint(pub Seconds);
 
 impl TimePoint {
@@ -229,7 +197,8 @@ impl Sub<Self> for TimePoint {
 }
 
 /// Represents a duration in the time domain, e.g. the length of a clip.
-#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, PartialOrd)]
+#[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Duration(pub Seconds);
 
 impl Duration {
@@ -250,7 +219,8 @@ impl Duration {
 }
 
 /// Represents a time section, e.g. the span of a clip in an arrangement.
-#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, PartialOrd)]
+#[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct TimeSection {
     pub start: TimePoint,
     pub duration: Duration,
