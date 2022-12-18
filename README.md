@@ -1,3 +1,2 @@
 # Rust Audio Basic Utilities (rabu)
-This is a personal project that collects some of the basic utilities I use for audio programming in Rust.
-Feel free to use it and to contribute if you feel something is missing or can be improved. 
+Some basic audio utilities and processors. These tools are meant to be simple and easy to use, while also expressing as much intend as possible.
