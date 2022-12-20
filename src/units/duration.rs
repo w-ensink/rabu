@@ -12,9 +12,11 @@ impl Duration {
     /// Converts the duration to samples using the given sample rate:
     /// ```
     /// use rabu::units::{Duration, SampleRate, Samples};
+    ///
     /// let duration = Duration::from_secs_f64(5.0);
     /// let sample_rate = SampleRate::from(44100);
     /// let num_samples = duration.to_samples(sample_rate);
+    ///
     /// assert_eq!(num_samples, Samples::from(220500));
     /// ```
     pub fn to_samples(&self, sr: SampleRate) -> Samples {
