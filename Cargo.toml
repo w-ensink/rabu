@@ -9,7 +9,7 @@ homepage = "https://github.com/w-ensink/rabu"
 repository = "https://github.com/w-ensink/rabu"
 readme = "README.md"
 categories = ["multimedia::audio"]
-keywords = ["audio", "utilities", "dsp", "filter", "buffer", "biquad"]
+keywords = ["audio", "dsp", "filter", "buffer", "biquad"]
 exclude = [".github/*", "justfile"]
 
 
