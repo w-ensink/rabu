@@ -1,3 +1,6 @@
+//! This module contains a `Buffer` struct that is useful for many audio related tasks.
+//! It contains functions for iterating in audio specific ways and manipulating the sample data.
+
 use std::cmp::min;
 use std::ops::Range;
 
@@ -7,7 +10,6 @@ use crate::units::{Channels, Samples};
 /// functions that make common audio related tasks simpler.
 #[derive(Clone, Debug)]
 pub struct Buffer<T> {
-    /// The actual stored data, channels are stored one after the other (not interleaved)
     data: Vec<T>,
     num_channels: Channels,
     num_samples: Samples,
@@ -86,12 +88,28 @@ where
     }
 
     /// Returns the number of channels in the buffer.
+    /// ```
+    /// use rabu::buffer::Buffer;
+    /// use rabu::units::{Channels, Samples};
+    ///
+    /// let buffer = Buffer::<f32>::allocate(Channels::from(2), Samples::from(4));
+    ///
+    /// assert_eq!(buffer.num_channels(), Channels::from(2));
+    /// ```
     pub fn num_channels(&self) -> Channels {
         self.num_channels
     }
 
     /// Returns the number of samples that each channel contains
-    /// (**not the total number of samples in the buffer**).
+    /// (**not the total number of samples in the buffer**):
+    /// ```
+    /// use rabu::buffer::Buffer;
+    /// use rabu::units::{Channels, Samples};
+    ///
+    /// let buffer = Buffer::<f32>::allocate(Channels::from(2), Samples::from(4));
+    ///
+    /// assert_eq!(buffer.num_samples(), Samples::from(4));
+    /// ```
     pub fn num_samples(&self) -> Samples {
         self.num_samples
     }
@@ -119,6 +137,18 @@ where
     }
 
     /// Returns an iterator to iterate over the channels in the buffer.
+    /// ```
+    /// use rabu::buffer::Buffer;
+    /// use rabu::units::{Channels, Samples};
+    ///
+    /// let buffer = Buffer::<f32>::allocate(Channels::from(2), Samples::from(4));
+    ///
+    /// for channel in buffer.iter_chans() {
+    ///     for sample in channel {
+    ///         println!("sample {}", sample);
+    ///     }   
+    /// }
+    /// ```
     pub fn iter_chans(&self) -> ChannelIterator<T> {
         ChannelIterator {
             buffer: self,
@@ -127,6 +157,18 @@ where
     }
 
     /// Returns a mutable iterator to iterate over the channels in the buffer.
+    /// ```
+    /// use rabu::buffer::Buffer;
+    /// use rabu::units::{Channels, Samples};
+    ///
+    /// let mut buffer = Buffer::allocate(Channels::from(2), Samples::from(4));
+    ///
+    /// for channel in buffer.iter_chans_mut() {
+    ///     for sample in channel.iter_mut() {
+    ///         *sample = 1.0;
+    ///     }
+    /// }
+    /// ```
     pub fn iter_chans_mut(&mut self) -> MutChannelIterator<T> {
         MutChannelIterator {
             buffer: self,
@@ -149,6 +191,16 @@ where
 
     /// Applies the given map function to all samples in the buffer.
     /// This can be useful for multiplying all samples by some value, for example.
+    /// ```
+    /// use rabu::buffer::Buffer;
+    /// use rabu::units::{Channels, Samples};
+    ///
+    /// let mut buffer = Buffer::<f32>::allocate(Channels::from(2), Samples::from(4));
+    ///
+    /// buffer.map_samples(|current_sample| current_sample + 2.0);
+    ///
+    /// assert!(buffer.data().iter().all(|v| *v == 2.0));
+    /// ```
     pub fn map_samples(&mut self, mut func: impl FnMut(T) -> T) {
         self.data
             .iter_mut()
@@ -156,6 +208,20 @@ where
     }
 
     /// Iterate over all samples in the buffer, but make it behave like an interleaved buffer.
+    /// ```
+    /// use rabu::buffer::Buffer;
+    /// use rabu::units::{Channels, Samples};
+    ///
+    /// let mut buffer = Buffer::allocate(Channels::from(2), Samples::from(3));
+    ///
+    /// buffer.chan_mut(0)[0] = 1.0;
+    /// buffer.chan_mut(0)[1] = 2.0;
+    /// buffer.chan_mut(0)[2] = 3.0;
+    ///
+    /// let result: Vec<_> = buffer.iter_interleaved().collect();
+    ///
+    /// assert_eq!(result, vec![1.0, 0.0, 2.0, 0.0, 3.0, 0.0]);
+    ///```
     pub fn iter_interleaved(&self) -> InterleavedIterator<T> {
         InterleavedIterator {
             buffer: self,
