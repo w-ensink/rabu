@@ -2,7 +2,7 @@ use derive_more::{Add, AddAssign, Sub, SubAssign};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-use crate::units::{SampleRate, Samples, TimePoint};
+use crate::units::{Duration, SampleRate, Samples, TimePoint};
 
 /// Represent seconds in audio domain.
 #[derive(Copy, Clone, Debug, PartialEq, Add, Sub, AddAssign, SubAssign, PartialOrd)]
@@ -26,10 +26,23 @@ impl Seconds {
     }
 }
 
+impl From<Duration> for Seconds {
+    fn from(value: Duration) -> Self {
+        value.as_seconds()
+    }
+}
+
+impl From<std::time::Duration> for Seconds {
+    fn from(value: std::time::Duration) -> Self {
+        Self(value.as_secs_f64())
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::units::{SampleRate, Samples, Seconds};
     use test_case::test_case;
+
+    use crate::units::{SampleRate, Samples, Seconds};
 
     #[test_case(Seconds(3.0), SampleRate(10) => Samples(30); "case 1")]
     #[test_case(Seconds(10.0), SampleRate(2) => Samples(20); "case 2")]

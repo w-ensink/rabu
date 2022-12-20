@@ -22,10 +22,32 @@ impl TimePoint {
     }
 }
 
+impl From<Seconds> for TimePoint {
+    fn from(value: Seconds) -> Self {
+        value.as_time_point()
+    }
+}
+
+impl Sub<Duration> for TimePoint {
+    type Output = Self;
+
+    fn sub(self, rhs: Duration) -> Self::Output {
+        Self::from(self.as_seconds() - rhs.as_seconds())
+    }
+}
+
 impl Add<Duration> for TimePoint {
     type Output = Self;
     fn add(self, rhs: Duration) -> Self::Output {
-        Self(self.as_seconds() + rhs.as_seconds())
+        Self::from(self.as_seconds() + rhs.as_seconds())
+    }
+}
+
+impl Sub<Seconds> for TimePoint {
+    type Output = Self;
+
+    fn sub(self, rhs: Seconds) -> Self::Output {
+        Self::from(self.as_seconds() - rhs)
     }
 }
 
@@ -33,7 +55,7 @@ impl Add<Seconds> for TimePoint {
     type Output = Self;
 
     fn add(self, rhs: Seconds) -> Self::Output {
-        Self(self.as_seconds() + rhs)
+        Self::from(self.as_seconds() + rhs)
     }
 }
 
@@ -46,6 +68,6 @@ impl AddAssign<Seconds> for TimePoint {
 impl Sub<Self> for TimePoint {
     type Output = Duration;
     fn sub(self, rhs: Self) -> Self::Output {
-        Duration(self.as_seconds() - rhs.as_seconds())
+        Duration::from(self.as_seconds() - rhs.as_seconds())
     }
 }

@@ -24,3 +24,15 @@ impl Duration {
         Self(Seconds(seconds))
     }
 }
+
+impl From<Seconds> for Duration {
+    fn from(value: Seconds) -> Self {
+        Self::from_seconds(value.value())
+    }
+}
+
+impl From<std::time::Duration> for Duration {
+    fn from(value: std::time::Duration) -> Self {
+        Self::from_seconds(value.as_secs_f64())
+    }
+}
