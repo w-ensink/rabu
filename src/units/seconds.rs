@@ -11,6 +11,16 @@ pub struct Seconds(f64);
 
 impl Seconds {
     /// Convert to samples using the given sample rate.
+    /// ```
+    /// use rabu::units::{SampleRate, Samples, Seconds};
+    ///
+    /// let seconds = Seconds::from(3.0);
+    /// let sample_rate = SampleRate::from(44100);
+    ///
+    /// let samples = seconds.to_samples(sample_rate);
+    ///
+    /// assert_eq!(samples, Samples::from(132_300));
+    /// ```
     pub fn to_samples(&self, sr: SampleRate) -> Samples {
         Samples::from((self.as_f64() * sr.as_u32() as f64).round() as u64)
     }
