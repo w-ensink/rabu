@@ -4,9 +4,10 @@
 //! Example of a low pass filter:
 //! ```rust
 //! use rabu::biquad::{BiquadFilter, low_pass_coefficients};
+//! use rabu::units::{Frequency, SampleRate};
 //!
-//! let sample_rate = 44100.0;
-//! let cutoff = 1000.0;
+//! let sample_rate = SampleRate::from(44100);
+//! let cutoff = Frequency::from(1000.0);
 //! let coefficients = low_pass_coefficients(sample_rate, cutoff);
 //!
 //! let mut filter = BiquadFilter::new(coefficients);
@@ -14,6 +15,8 @@
 //! let input_sample = 0.5;
 //! let output_sample = filter.process(input_sample);
 //! ```
+
+use crate::units::{Frequency, SampleRate};
 
 /// The coefficients for a `BiquadFilter`.
 pub struct BiquadCoefficients {
@@ -67,8 +70,11 @@ impl BiquadFilter {
 
 /// Creates the biquad coefficients for a low pass filter,
 /// given a sample rate and a cutoff frequency.
-pub fn low_pass_coefficients(sample_rate: f64, cutoff_frequency: f64) -> BiquadCoefficients {
-    let w0 = 2.0 * std::f64::consts::PI * cutoff_frequency / sample_rate;
+pub fn low_pass_coefficients(
+    sample_rate: SampleRate,
+    cutoff_frequency: Frequency,
+) -> BiquadCoefficients {
+    let w0 = 2.0 * std::f64::consts::PI * cutoff_frequency.as_f64() / sample_rate.as_f64();
     let cos_w0 = w0.cos();
     let sin_w0 = w0.sin();
     let alpha = sin_w0 / (2.0 * 0.5);
@@ -92,14 +98,14 @@ pub fn low_pass_coefficients(sample_rate: f64, cutoff_frequency: f64) -> BiquadC
 /// Creates the biquad coefficients for a band pass filter,
 /// given a sample rate and a cutoff frequency.
 pub fn band_pass_coefficients(
-    sample_rate: f64,
-    center_frequency: f64,
+    sample_rate: SampleRate,
+    center_frequency: Frequency,
     bandwidth: f64,
 ) -> BiquadCoefficients {
-    let w0 = 2.0 * std::f64::consts::PI * center_frequency / sample_rate;
+    let w0 = 2.0 * std::f64::consts::PI * center_frequency.as_f64() / sample_rate.as_f64();
     let cos_w0 = w0.cos();
     let sin_w0 = w0.sin();
-    let alpha = sin_w0 * std::f64::consts::SQRT_2 / 2.0 * bandwidth / center_frequency;
+    let alpha = sin_w0 * std::f64::consts::SQRT_2 / 2.0 * bandwidth / center_frequency.as_f64();
 
     let b0 = sin_w0 / 2.0;
     let b1 = 0.0;
@@ -119,8 +125,11 @@ pub fn band_pass_coefficients(
 
 /// Creates the biquad coefficients for a high pass filter,
 /// given a sample rate and a cutoff frequency.
-pub fn high_pass_coefficients(sample_rate: f64, cutoff_frequency: f64) -> BiquadCoefficients {
-    let w0 = 2.0 * std::f64::consts::PI * cutoff_frequency / sample_rate;
+pub fn high_pass_coefficients(
+    sample_rate: SampleRate,
+    cutoff_frequency: Frequency,
+) -> BiquadCoefficients {
+    let w0 = 2.0 * std::f64::consts::PI * cutoff_frequency.as_f64() / sample_rate.as_f64();
     let cos_w0 = w0.cos();
     let sin_w0 = w0.sin();
     let alpha = sin_w0 / (2.0 * 0.5);

@@ -1,31 +1,36 @@
-use crate::units::{Duration, Seconds};
+use crate::units::{Duration, Frequency, Seconds};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
 /// Represents a sample rate (in Hz.).
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct SampleRate(u32);
+pub struct SampleRate(Frequency);
 
 impl SampleRate {
+    /// Gives the sample rate as a `Frequency`.
+    pub fn as_frequency(&self) -> Frequency {
+        self.0
+    }
+
     /// Gives back the raw value as a `u32`.
     pub fn as_u32(&self) -> u32 {
-        self.0
+        self.as_f64() as _
     }
 
     /// Gives back the raw value as a `usize`.
     pub fn as_usize(&self) -> usize {
-        self.as_u32() as usize
+        self.as_f64() as usize
     }
 
     /// Gives back the raw value as a `f64`.
     pub fn as_f64(&self) -> f64 {
-        self.as_u32() as f64
+        self.0.as_f64()
     }
 
     /// Gives back the raw value as a `u64`.
     pub fn as_u64(&self) -> u64 {
-        self.as_u32() as u64
+        self.as_f64() as u64
     }
 
     /// Gets the duration between two consecutive samples:
@@ -56,30 +61,43 @@ impl SampleRate {
     }
 }
 
-macro_rules! impl_int_conversions {
+macro_rules! impl_from_int_type {
     ($int_type: ty) => {
         impl From<$int_type> for SampleRate {
             fn from(value: $int_type) -> Self {
-                Self(value as _)
-            }
-        }
-
-        impl From<SampleRate> for $int_type {
-            fn from(value: SampleRate) -> Self {
-                value.0 as _
+                Self(Frequency::from(value))
             }
         }
     };
 }
 
-impl_int_conversions!(u64);
-impl_int_conversions!(u32);
-impl_int_conversions!(u16);
-impl_int_conversions!(u8);
-impl_int_conversions!(usize);
+impl_from_int_type!(u64);
+impl_from_int_type!(u32);
+impl_from_int_type!(u16);
+impl_from_int_type!(u8);
+impl_from_int_type!(usize);
 
-impl_int_conversions!(i64);
-impl_int_conversions!(i32);
-impl_int_conversions!(i16);
-impl_int_conversions!(i8);
-impl_int_conversions!(isize);
+impl_from_int_type!(i64);
+impl_from_int_type!(i32);
+impl_from_int_type!(i16);
+impl_from_int_type!(i8);
+impl_from_int_type!(isize);
+
+macro_rules! impl_float_conversions {
+    ($int_type: ty) => {
+        impl From<$int_type> for SampleRate {
+            fn from(value: $int_type) -> Self {
+                Self(Frequency::from(value))
+            }
+        }
+
+        impl From<SampleRate> for $int_type {
+            fn from(value: SampleRate) -> Self {
+                value.as_f64() as _
+            }
+        }
+    };
+}
+
+impl_float_conversions!(f64);
+impl_float_conversions!(f32);

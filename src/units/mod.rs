@@ -1,6 +1,7 @@
 pub use bit_depth::BitDepth;
 pub use channels::Channels;
 pub use duration::Duration;
+pub use frequency::Frequency;
 pub use latency::Latency;
 pub use percentage::Percentage;
 pub use sample_rate::SampleRate;
@@ -12,6 +13,7 @@ pub use time_section::TimeSection;
 mod bit_depth;
 mod channels;
 mod duration;
+mod frequency;
 mod latency;
 mod percentage;
 mod sample_rate;
