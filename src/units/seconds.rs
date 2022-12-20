@@ -12,7 +12,7 @@ pub struct Seconds(f64);
 impl Seconds {
     /// Convert to samples using the given sample rate.
     pub fn to_samples(&self, sr: SampleRate) -> Samples {
-        Samples::from((self.as_f64() * sr.as_u32() as f64) as u64)
+        Samples::from((self.as_f64() * sr.as_u32() as f64).round() as u64)
     }
 
     /// Gives back the raw value in f64.
@@ -65,6 +65,7 @@ mod tests {
 
     #[test_case(Seconds::from(3.0), SampleRate::from(10) => Samples::from(30); "case 1")]
     #[test_case(Seconds::from(10.0), SampleRate::from(2) => Samples::from(20); "case 2")]
+    #[test_case(Seconds::from(10.4), SampleRate::from(2.0) => Samples::from(21); "round important")]
     fn seconds_to_samples(seconds: Seconds, sample_rate: SampleRate) -> Samples {
         seconds.to_samples(sample_rate)
     }
