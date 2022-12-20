@@ -1,6 +1,6 @@
 [package]
 name = "rabu"
-version = "0.2.4"
+version = "0.3.0"
 edition = "2021"
 description = "Rust Audio Basic Utilies"
 authors = ["Wouter Ensink"]
@@ -9,7 +9,7 @@ homepage = "https://github.com/w-ensink/rabu"
 repository = "https://github.com/w-ensink/rabu"
 readme = "README.md"
 categories = ["multimedia::audio"]
-keywords = ["audio", "utilities"]
+keywords = ["audio", "utilities", "dsp", "filter", "buffer", "biquad"]
 exclude = [".github/*", "justfile"]
 
 
