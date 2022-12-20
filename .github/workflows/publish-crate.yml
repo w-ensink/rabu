@@ -25,6 +25,8 @@ jobs:
           
       - name: Check Fmt
         run: cargo fmt --check
+      - name: Assert no warnings
+        run: cargo clippy -- -D warnings
       - name: Build
         run: cargo build --verbose
       - name: Run tests

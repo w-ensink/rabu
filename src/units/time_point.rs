@@ -8,17 +8,22 @@ use crate::units::{Duration, Seconds};
 /// Represents a time point in the audio domain, e.g. the start position of a file.
 #[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct TimePoint(pub Seconds);
+pub struct TimePoint(Seconds);
 
 impl TimePoint {
-    /// Gives back the time point in seconds
+    /// Gives back the time point in seconds.
     pub fn as_seconds(&self) -> Seconds {
         self.0
     }
 
+    /// Gives back the time point in seconds as a `f64`.
+    pub fn as_secs_f64(&self) -> f64 {
+        self.as_seconds().as_f64()
+    }
+
     /// Creates a new time point from the given seconds.
-    pub fn from_seconds(seconds: f64) -> Self {
-        Self(Seconds(seconds))
+    pub fn from_secs_f64(seconds: f64) -> Self {
+        Self(Seconds::from(seconds))
     }
 }
 

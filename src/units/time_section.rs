@@ -35,14 +35,14 @@ impl TimeSection {
 mod test {
     use test_case::test_case;
 
-    use crate::units::{Duration, Seconds, TimePoint, TimeSection};
+    use crate::units::{Duration, TimePoint, TimeSection};
 
     /// creates `TimeSection` with `time!(<start>; <duration>)`
     macro_rules! time {
         ($start:expr; $duration:expr) => {
             TimeSection {
-                start: TimePoint(Seconds($start)),
-                duration: Duration(Seconds($duration)),
+                start: TimePoint::from_secs_f64($start),
+                duration: Duration::from_secs_f64($duration),
             }
         };
     }

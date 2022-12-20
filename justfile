@@ -1,4 +1,4 @@
-pre-commit: check-fmt build test
+pre-commit: check-fmt assert-no-warnings build test
 
 test:
     cargo test --verbose
@@ -11,3 +11,6 @@ fmt:
 
 check-fmt:
     cargo fmt --check
+
+assert-no-warnings:
+    cargo clippy -- -D warnings

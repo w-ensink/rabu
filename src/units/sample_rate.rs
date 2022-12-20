@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 /// Represents a sample rate (in Hz.).
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct SampleRate(pub u32);
+pub struct SampleRate(u32);
 
 impl SampleRate {
     /// Gives back the raw value as a `u32`.
@@ -27,3 +27,31 @@ impl SampleRate {
         self.value() as u64
     }
 }
+
+macro_rules! impl_int_conversions {
+    ($int_type: ty) => {
+        impl From<$int_type> for SampleRate {
+            fn from(value: $int_type) -> Self {
+                Self(value as _)
+            }
+        }
+
+        impl From<SampleRate> for $int_type {
+            fn from(value: SampleRate) -> Self {
+                value.0 as _
+            }
+        }
+    };
+}
+
+impl_int_conversions!(u64);
+impl_int_conversions!(u32);
+impl_int_conversions!(u16);
+impl_int_conversions!(u8);
+impl_int_conversions!(usize);
+
+impl_int_conversions!(i64);
+impl_int_conversions!(i32);
+impl_int_conversions!(i16);
+impl_int_conversions!(i8);
+impl_int_conversions!(isize);

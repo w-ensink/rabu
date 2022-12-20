@@ -249,7 +249,7 @@ mod tests {
 
     #[test]
     fn interleaved_iterator() {
-        let mut buffer = Buffer::allocate(Channels(2), Samples(3));
+        let mut buffer = Buffer::allocate(Channels::from(2), Samples::from(3));
         buffer.chan_mut(0)[0] = 1.0;
         buffer.chan_mut(0)[1] = 1.0;
         buffer.chan_mut(0)[2] = 1.0;
@@ -264,46 +264,46 @@ mod tests {
 
     #[test]
     fn correct_num_samples_and_channels() {
-        let buffer = Buffer::<f32>::allocate(Channels(2), Samples(10));
-        assert_eq!(buffer.num_samples(), Samples(10));
-        assert_eq!(buffer.num_channels(), Channels(2));
+        let buffer = Buffer::<f32>::allocate(Channels::from(2), Samples::from(10));
+        assert_eq!(buffer.num_samples(), Samples::from(10));
+        assert_eq!(buffer.num_channels(), Channels::from(2));
     }
 
     #[test]
     fn index_into_channels() {
-        let buffer = Buffer::<f32>::allocate(Channels(2), Samples(10));
+        let buffer = Buffer::<f32>::allocate(Channels::from(2), Samples::from(10));
 
         assert_eq!(buffer.chan(0).len(), buffer.num_samples().as_usize());
     }
 
     #[test]
     fn iterate_channels() {
-        let buffer = Buffer::<f32>::allocate(Channels(2), Samples(10));
+        let buffer = Buffer::<f32>::allocate(Channels::from(2), Samples::from(10));
         let mut num = 0;
         for _chan in buffer.iter_chans() {
             num += 1;
         }
 
-        assert_eq!(Channels(num), buffer.num_channels());
+        assert_eq!(Channels::from(num), buffer.num_channels());
     }
 
     #[test]
     fn map_samples() {
-        let mut buffer = Buffer::<f32>::allocate(Channels(2), Samples(3));
+        let mut buffer = Buffer::<f32>::allocate(Channels::from(2), Samples::from(3));
         buffer.map_samples(|_| 0.5);
         assert_eq!(buffer.chan(1)[2], 0.5);
     }
 
     #[test]
     fn clone_with_new_bigger_size() {
-        let mut buffer = Buffer::<f32>::allocate(Channels(2), Samples(3));
+        let mut buffer = Buffer::<f32>::allocate(Channels::from(2), Samples::from(3));
         for chan in buffer.channel_indices() {
             for samp in buffer.sample_indices() {
                 buffer.chan_mut(chan)[samp] = samp as f32;
             }
         }
 
-        let resized = buffer.clone_resized(Channels(3), Samples(4));
+        let resized = buffer.clone_resized(Channels::from(3), Samples::from(4));
 
         assert_eq!(resized.chan(0)[1], 1.0);
         assert_eq!(resized.chan(0)[3], 0.0);
@@ -316,14 +316,14 @@ mod tests {
 
     #[test]
     fn clone_with_new_smaller_size() {
-        let mut buffer = Buffer::<f32>::allocate(Channels(2), Samples(3));
+        let mut buffer = Buffer::<f32>::allocate(Channels::from(2), Samples::from(3));
         for chan in buffer.channel_indices() {
             for samp in buffer.sample_indices() {
                 buffer.chan_mut(chan)[samp] = samp as f32;
             }
         }
 
-        let resized = buffer.clone_resized(Channels(1), Samples(2));
+        let resized = buffer.clone_resized(Channels::from(1), Samples::from(2));
 
         assert_eq!(resized.chan(0)[1], 1.0);
         assert_eq!(resized.chan(0)[0], 0.0);
