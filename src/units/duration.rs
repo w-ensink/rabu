@@ -9,7 +9,14 @@ use crate::units::{SampleRate, Samples, Seconds};
 pub struct Duration(Seconds);
 
 impl Duration {
-    /// Converts the duration to samples using the given sample rate.
+    /// Converts the duration to samples using the given sample rate:
+    /// ```
+    /// use rabu::units::{Duration, SampleRate, Samples};
+    /// let duration = Duration::from_secs_f64(5.0);
+    /// let sample_rate = SampleRate::from(44100);
+    /// let num_samples = duration.to_samples(sample_rate);
+    /// assert_eq!(num_samples, Samples::from(220500));
+    /// ```
     pub fn to_samples(&self, sr: SampleRate) -> Samples {
         self.0.to_samples(sr)
     }
@@ -26,6 +33,12 @@ impl Duration {
     /// Creates a new duration from the given number of seconds.
     pub fn from_secs_f64(seconds: f64) -> Self {
         Self(Seconds::from(seconds))
+    }
+}
+
+impl PartialEq<Seconds> for Duration {
+    fn eq(&self, other: &Seconds) -> bool {
+        self.as_seconds() == *other
     }
 }
 

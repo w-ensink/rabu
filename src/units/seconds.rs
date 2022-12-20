@@ -12,7 +12,7 @@ pub struct Seconds(f64);
 impl Seconds {
     /// Convert to samples using the given sample rate.
     pub fn to_samples(&self, sr: SampleRate) -> Samples {
-        Samples::from((self.as_f64() * sr.value() as f64) as u64)
+        Samples::from((self.as_f64() * sr.as_u32() as f64) as u64)
     }
 
     /// Gives back the raw value in f64.

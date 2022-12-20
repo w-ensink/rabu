@@ -17,7 +17,7 @@ impl Samples {
 
     /// Converts to seconds using the given sample rate.
     pub fn to_seconds(&self, sr: SampleRate) -> Seconds {
-        Seconds::from(self.as_u64() as f64 / sr.value() as f64)
+        Seconds::from(self.as_u64() as f64 / sr.as_u32() as f64)
     }
 
     /// Gives back the raw value as a `usize`.

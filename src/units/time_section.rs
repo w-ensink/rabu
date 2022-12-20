@@ -14,6 +14,25 @@ pub struct TimeSection {
 
 impl TimeSection {
     /// Returns the overlap (if any) between this time section and another.
+    /// This should also be used in order to find out whether there is overlap or not.
+    /// ```
+    /// use rabu::units::{Seconds, TimePoint, TimeSection};
+    ///
+    /// let section_1 = TimeSection {
+    ///     start: Seconds::from(1.0).into(),
+    ///     duration: Seconds::from(2.0).into(),
+    /// };
+    ///
+    /// let section_2 = TimeSection {
+    ///     start: Seconds::from(1.5).into(),
+    ///     duration: Seconds::from(1.0).into(),
+    /// };
+    ///
+    /// let overlap = section_1.get_overlap(section_2).unwrap();
+    ///
+    /// assert_eq!(overlap.start, Seconds::from(1.5));
+    /// assert_eq!(overlap.duration, Seconds::from(1.0));
+    /// ```
     pub fn get_overlap(&self, other: Self) -> Option<Self> {
         if self.end() <= other.start || other.end() <= self.start {
             return None;
